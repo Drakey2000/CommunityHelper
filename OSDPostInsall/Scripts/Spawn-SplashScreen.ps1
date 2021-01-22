@@ -1,5 +1,5 @@
 ﻿# The fresh look to the summary screen, has come from me hijacking the awesome splash screen from Trevor Joneshttps://smsagent.blog/2018/08/21/create-a-custom-splash-screen-for-a-windows-10-in-place-upgrade/ 
-# and adapted it to work with here along with the incredible tools provided by https://mahapps.com/
+# and adapted it to work here along with the incredible tools provided by https://mahapps.com/
 
 
 # Set the location we are running from

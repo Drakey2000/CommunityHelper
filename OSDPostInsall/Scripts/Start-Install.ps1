@@ -1,4 +1,7 @@
-﻿# Create a new PS process to call the "Show-OSUpgradeBackground" script, to avoid blocking the continuation of task sequence
+﻿# The fresh look to the summary screen, has come from me hijacking the awesome splash screen from Trevor Joneshttps://smsagent.blog/2018/08/21/create-a-custom-splash-screen-for-a-windows-10-in-place-upgrade/ 
+# and adapted it to work here along with the incredible tools provided by https://mahapps.com/
+
+# Create a new PS process to call the "Spawn-Packages.ps1" and "Spawn-SplashScreen.ps1" script to prevennt the splash screen from blocking the installation script
 
 # Enable Cleanup and Restart
 $CleanupAndRestart = $False
