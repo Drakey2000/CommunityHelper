@@ -3,60 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         Title="MainWindow" WindowStyle="None" ResizeMode="NoResize" Foreground="White" Topmost="True" Left="0" Top="0" Height="0" Width="0">
-	    
-
-     <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-	    </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
-    <Window.Triggers>
-    <EventTrigger
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
+	<Window.Triggers>
+		<EventTrigger
       RoutedEvent="Window.Loaded">
 
-      <BeginStoryboard Name="MainTextBlockBeginStoryBoard" >
-        <Storyboard>
-          <DoubleAnimation Storyboard.TargetName="MainTextBlock" Storyboard.TargetProperty="(TextBlock.Opacity)" From="1.0" To="0.0" Duration="0:0:3" AutoReverse="True" RepeatBehavior="Forever" FillBehavior="HoldEnd" />
-        </Storyboard>
-      </BeginStoryboard>
-
-    </EventTrigger>
-  </Window.Triggers> 
-
-  <Window.Background>
-           <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-               <GradientStop Color="#012a47" Offset="0" />
-               <GradientStop Color="#1271b5" Offset="0.3" />
-               <GradientStop Color="#1271b5" Offset="0.6" />
-               <GradientStop Color="#012a47" Offset="1" />
-           </LinearGradientBrush>
-   </Window.Background>
-
-    <Grid Name="MainGrid" Height="Auto" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="35*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-	<StackPanel Grid.Row="0" Margin="0,100,0,40" VerticalAlignment="Bottom">
-           <TextBlock Name="MainTextBlock" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,15" FontSize="50" FontWeight="Light" VerticalAlignment="Bottom" HorizontalAlignment="Center" TextAlignment="Center" />
-	</StackPanel>
-	<ScrollViewer Grid.Row="1" Margin="20,0,20,0" VerticalAlignment="Center" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" > 
-		<TextBlock Name="TextBlock2" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,0" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
-	</ScrollViewer> 
-        <StackPanel Grid.Row="2" Margin="0,40,0,100" VerticalAlignment="Top">
-            <TextBlock Name="TextBlock3" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,15" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
-            <ProgressBar Name="ProgressBar" Value="0" Width="210" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15" />
-            <TextBlock Name="TextBlock4" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,15" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
-            <TextBlock Name="TextBlock5" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,20" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />  
-	    <Button Name="Button1" Height="40" Width="100" Background="Transparent" BorderThickness="1" Visibility = "Hidden" />
-	</StackPanel>
-    </Grid>
+			<BeginStoryboard Name="MainTextBlockBeginStoryBoard" >
+				<Storyboard>
+					<DoubleAnimation Storyboard.TargetName="MainTextBlock" Storyboard.TargetProperty="(TextBlock.Opacity)" From="1.0" To="0.0" Duration="0:0:3" AutoReverse="True" RepeatBehavior="Forever" FillBehavior="HoldEnd" />
+				</Storyboard>
+			</BeginStoryboard>
+		</EventTrigger>
+	</Window.Triggers> 
+	<Window.Background>
+		<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+			<GradientStop Color="#012a47" Offset="0.2" />
+			<GradientStop Color="#1271b5" Offset="0.5" />
+			<GradientStop Color="#012a47" Offset="0.8" />
+		</LinearGradientBrush>
+	</Window.Background>
+	<Grid Name="MainGrid" Height="Auto" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="35*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<StackPanel Grid.Row="0" Margin="0,100,0,40" VerticalAlignment="Bottom">
+			<TextBlock Name="MainTextBlock" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,15" FontSize="50" FontWeight="Light" VerticalAlignment="Bottom" HorizontalAlignment="Center" TextAlignment="Center" />
+		</StackPanel>
+		<ScrollViewer Grid.Row="1" Margin="20,0,20,0" VerticalAlignment="Center" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" > 
+			<TextBlock Name="TextBlock2" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,0" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
+		</ScrollViewer> 
+		<StackPanel Grid.Row="2" Margin="0,40,0,100" VerticalAlignment="Top">
+			<TextBlock Name="TextBlock3" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,15" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
+			<ProgressBar Name="ProgressBar" Value="0" Width="210" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,15" />
+			<TextBlock Name="TextBlock4" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,15" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
+			<TextBlock Name="TextBlock5" Text="" TextWrapping="Wrap" MaxWidth="0" Margin="0,0,0,20" FontSize="18" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />  
+			<Button Name="Button1" Height="40" Width="100" Background="Transparent" BorderThickness="1" Visibility = "Hidden" />
+		</StackPanel>
+	</Grid>
 </Window>
