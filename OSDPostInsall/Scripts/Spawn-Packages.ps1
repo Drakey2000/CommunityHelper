@@ -1,13 +1,28 @@
 ﻿#################################################################################      Packages      #################################################################################
 
 # Set all your required post installation tasks here...msi, .exe, .vbs, bat etc Silent commands, parameters, mst files
+  
+# Initialize Package List HashTable
+$packageList = @() 
 
-$packageList = [ordered]@{
-    'VMware Tools 11.0.0' = 'Install - Example A\Install.bat'
-    'SQL Server 2016' = 'Install - Example B\Install.bat'
-    'CCMAgent 5.00.9012.1020' = 'Install - Example C\Install.bat'
+  # Example A
+  $packageList += [PSCustomObject]@{
+        Name = 'VMware Tools 11.0.0'
+        FolderPath = 'Install - Example A\Install.bat' 
+        Arguments = ''}
+  
+  # Example B  
+  $packageList += [PSCustomObject]@{
+        Name = 'SQL Server 2016'
+        FolderPath = 'Install - Example B\Install.bat' 
+        Arguments = ''}
 
-}
+  # Example C  
+  $packageList += [PSCustomObject]@{
+        Name = 'CCMAgent 5.00.9012.1020'
+        FolderPath = 'Install - Example C\Install.bat' 
+        Arguments = ''}
+
 
 
 #################################################################################      Function      #################################################################################
@@ -96,22 +111,36 @@ try{
     foreach($package in $packageList.GetEnumerator()) {
 
     # Set PackageName
-    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageName" -Value $package.Key -PropertyType "String" -Force
+    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageName" -Value $package.Name -PropertyType "String" -Force
 
 
     # Build package full file path
-    $packagePath = join-path -path $PackageRootFolder -ChildPath $($package.Value)
+    $packagePath = join-path -path $PackageRootFolder -ChildPath $($package.FolderPath)
 
     # Log the number of items to be processed
     Write-Log -Level INFO "process $($count) of $($packageList.count)"
 
-    # Log the application being processed
-    Write-Log -Level INFO "starting installation of '$($package.Key)' from '$packagePath'"
+
 
         try{
 
-        # start the installation
-        $process = Start-Process -FilePath "$packagePath" -wait -PassThru -ErrorAction Continue
+        # Check for Argumnets and start the installation
+        If([string]::IsNullOrWhitespace($package.Arguments)){
+        
+            # Log the application being processed
+            Write-Log -Level INFO "starting installation of '$($package.Name)' from '$($packagePath)'"
+
+            $process = Start-Process -FilePath "$packagePath" -wait -PassThru -ErrorAction Continue 
+        
+        }else{
+
+            # Log the application being processed
+            Write-Log -Level INFO "starting installation of '$($package.Name)' from '$($packagePath)' with arguments '$($package.Arguments)'"
+
+            $process = Start-Process -FilePath "$packagePath" -ArgumentList $package.Arguments -wait -PassThru -ErrorAction Continue
+        
+        }
+       
 
         # Did the process return an exit code 0 ?
         If ($process.exitcode -eq 0) {
@@ -120,7 +149,7 @@ try{
             Write-Log -Level INFO "installation completed with exitcode $($process.ExitCode)"
 
             # update package installation progress
-            Add-Content $ProgressLogfile -Value ("$($package.Key) - Successful`n")
+            Add-Content $ProgressLogfile -Value ("$($package.Name) - Successful`n")
 
             } else {
 
@@ -131,7 +160,7 @@ try{
             $scriptError++
 
             # write log file - Failure
-            Add-Content $ProgressLogfile -Value ("$($package.Key) - Failure`n")
+            Add-Content $ProgressLogfile -Value ("$($package.Name) - Failure`n")
 
             # Set Package Error Count
             New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageErrorCount" -Value $scriptError -PropertyType "String" -Force
@@ -149,7 +178,7 @@ try{
         $scriptError++
 
         # write log file - Failure
-        Add-Content $ProgressLogfile -Value ("$($package.Key) - Failure`n")
+        Add-Content $ProgressLogfile -Value ("$($package.Name) - Failure`n")
 
         # Set Package Error Count
         New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageErrorCount" -Value $scriptError -PropertyType "String" -Force
