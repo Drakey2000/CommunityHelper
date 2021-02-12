@@ -11,7 +11,7 @@
 
 .NOTES
     Author     : STEVEN DRAKE
-    Version    : 19 Jan  2021 - Updated
+    Version    : 12 Feb  2021 - Updated Try Catch BitLocker Get-BitLockerVolume
 #>
 ##################################################################  Set Startup Parameters  ##################################################################
 
@@ -86,7 +86,11 @@
     If ((Test-Path -Path "$env:SystemRoot\Temp\OSDReport\TSEnv.xml") -eq $True) {$SMSEnv = Import-Clixml -Path "$env:SystemRoot\Temp\OSDReport\TSEnv.xml" }
 
     # Get BitLocker Info
-    $SystemBitLocker = Get-BitLockerVolume | Select-Object MountPoint,VolumeType,VolumeStatus,EncryptionMethod,EncryptionPercentage,@{Name = "KeyProtector"; Expression = {$_.KeyProtector -join ", "}},AutoUnlockKeyStored,AutoUnlockEnabled,ProtectionStatus | Sort-Object MountPoint
+    Try{
+
+        $SystemBitLocker = Get-BitLockerVolume | Select-Object MountPoint,VolumeType,VolumeStatus,EncryptionMethod,EncryptionPercentage,@{Name = "KeyProtector"; Expression = {$_.KeyProtector -join ", "}},AutoUnlockKeyStored,AutoUnlockEnabled,ProtectionStatus | Sort-Object MountPoint
+    
+    }Catch{Add-Content $LogFile -Value $_.Exception.Message}
 
     # Get Hardware Info
     $SystemHardware = $ComputerInfo | Select-Object `
@@ -387,17 +391,17 @@
 
 
     # Close Button Action : Cleanup tasks, remove OSDReport directory, Set EnableCursorSuppression and close Form
-    $UI.Button1.Add_Click({$Form.Close()})
+    $UI.Button1.Add_Click({$UI.Window.Close()})
 
     # Event: Window loaded
     $UI.Window.Add_Loaded({
 
     # Activate the window to bring it to the fore
-    $This.Activate()
+    $UI.Window.Activate()
 
-    $This.Height = $PrimaryMonitor.Height
-    $This.Width = $PrimaryMonitor.Width
-    $This.TopMost = $True
+    $UI.Window.Height = $PrimaryMonitor.Height
+    $UI.Window.Width = $PrimaryMonitor.Width
+    $UI.Window.TopMost = $True
 
     })
 
