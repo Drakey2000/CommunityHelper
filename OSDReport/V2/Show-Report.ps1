@@ -10,7 +10,7 @@
 .EXAMPLE
 
 .NOTES
-    Author     : STEVEN DRAKE
+    Author     : STEVEN DRAKE - https://ourcommunityhelper.com/2020/11/27/operating-system-deployment-summary-screen/
     Version    : 12 Feb  2021 - Updated Try Catch BitLocker Get-BitLockerVolume
 #>
 ##################################################################  Set Startup Parameters  ##################################################################
