@@ -1,8 +1,4 @@
-﻿# The fresh look to the summary screen, has come from me hijacking the awesome splash screen from Trevor Joneshttps://smsagent.blog/2018/08/21/create-a-custom-splash-screen-for-a-windows-10-in-place-upgrade/ 
-# and adapted it to work here along with the incredible tools provided by https://mahapps.com/
-
-
-# Set the location we are running from
+﻿# Set the location we are running from
 $Source = $PSScriptRoot
 
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase,System.Windows.Forms,System.Drawing,System.DirectoryServices.AccountManagement
@@ -58,7 +54,7 @@ $UI.TextBlock5.MaxWidth = $PrimaryMonitor.Width
 
 $UI.MainTextBlock.Text = "We are now running post setup tasks"
 $UI.TextBlock2.Text = ""
-$UI.TextBlock3.Text = "Post Installation Progress 0%"
+$UI.TextBlock3.Text = "Installation Progress"
 $UI.TextBlock4.Text = "00:00:00"
 $UI.TextBlock5.Text = "This will not take long...don't turn off your pc"
 
@@ -67,7 +63,7 @@ $Image = New-Object System.Windows.Controls.Image
 $Image.Source = "$Source\Resources\Images\Blue-PowerButton.png"
 $UI.Button1.Content = $Image
 
-# Run on Frequency - Update Main Text, Status, Animation
+# Run on Frequency - Update Main Text, Status, Animation, Update Progress Bar and Stop watch
 $TimerCode = {
 
     # Set TimerCode - Timer to 1 Seconds
@@ -75,6 +71,15 @@ $TimerCode = {
 
     # Get running status from registry
     $Status = Get-ItemProperty -Path HKLM:Software\CommunityHelper\PostInstall -Name Status | Select-Object -ExpandProperty Status -ErrorAction SilentlyContinue
+
+    # Update Stopwatch and Progress
+    $Count = Get-ItemProperty -Path HKLM:Software\CommunityHelper\PostInstall -Name PackageCount | Select-Object -ExpandProperty PackageCount -ErrorAction SilentlyContinue
+    $TotalCount = Get-ItemProperty -Path HKLM:Software\CommunityHelper\PostInstall -Name PackageCountTotal | Select-Object -ExpandProperty PackageCountTotal -ErrorAction SilentlyContinue
+    $ProgressValue = Get-ItemProperty -Path HKLM:Software\CommunityHelper\PostInstall -Name PackageCountPercentage | Select-Object -ExpandProperty PackageCountPercentage -ErrorAction SilentlyContinue
+
+    $UI.TextBlock4.Text = "$($Stopwatch.Elapsed.Hours.ToString('00')):$($Stopwatch.Elapsed.Minutes.ToString('00')):$($Stopwatch.Elapsed.Seconds.ToString('00'))"
+    $UI.ProgressBar.Value  = $ProgressValue
+    $UI.TextBlock3.Text = "Step $Count of $TotalCount"
 
     # If Status Success
     If($status -eq 'Success'){
@@ -122,20 +127,6 @@ $DispatcherTimer = New-Object -TypeName System.Windows.Threading.DispatcherTimer
 $DispatcherTimer.Interval = [TimeSpan]::FromSeconds(6)
 $DispatcherTimer.Add_Tick($TimerCode)
 
-# Run on Frequency - Update Progress Bar and Stop watch
-$TimerCode2 = {
-    $ProgressValue = Get-ItemProperty -Path HKLM:Software\CommunityHelper\PostInstall -Name PackageCountPercentage | Select-Object -ExpandProperty PackageCountPercentage -ErrorAction SilentlyContinue
-    $UI.TextBlock4.Text = "$($Stopwatch.Elapsed.Hours.ToString('00')):$($Stopwatch.Elapsed.Minutes.ToString('00')):$($Stopwatch.Elapsed.Seconds.ToString('00'))"
-    $UI.ProgressBar.Value  = $ProgressValue
-    $UI.TextBlock3.Text = "Post Installation Progress $ProgressValue%"
-}
-
-# Set TimerCode2
-$DispatcherTimer2 = New-Object -TypeName System.Windows.Threading.DispatcherTimer
-$DispatcherTimer2.Interval = [TimeSpan]::FromSeconds(1)
-$DispatcherTimer2.Add_Tick($TimerCode2)
-
-
 # Create Progress stop watch
 $Stopwatch = New-Object System.Diagnostics.Stopwatch
 
@@ -143,14 +134,14 @@ $Stopwatch = New-Object System.Diagnostics.Stopwatch
 $UI.Window.Add_Loaded({
 
     # Activate the window to bring it to the fore
-    $This.Activate()
+    $UI.Window.Activate()
 
     # Fill the screen
-    $This.Left = $PrimaryMonitor.Left
-    $This.Top = $PrimaryMonitor.Top
-    $This.Height = $PrimaryMonitor.Height
-    $This.Width = $PrimaryMonitor.Width
-    $This.TopMost = $True
+    $UI.Window.Left = $PrimaryMonitor.Left
+    $UI.Window.Top = $PrimaryMonitor.Top
+    $UI.Window.Height = $PrimaryMonitor.Height
+    $UI.Window.Width = $PrimaryMonitor.Width
+    $UI.Window.TopMost = $True
 
     # Keep Display awake
     [DisplayState]::KeepDisplayAwake()
@@ -166,7 +157,6 @@ $UI.Window.Add_Closing({
     # Stop stop watch and timers
     $Stopwatch.Stop()
     $DispatcherTimer.Stop()
-    $DispatcherTimer2.Stop()
 })
 
 # Event: Close the window on right-click (for testing)
@@ -178,7 +168,6 @@ $UI.Button1.Add_Click({$UI.Window.Close()})
 # Start timers and stop watch
 $Stopwatch.Start()
 $DispatcherTimer.Start()
-$DispatcherTimer2.Start()
 
 # Display the window
 $UI.Window.ShowDialog()

@@ -74,17 +74,23 @@ Function Write-Log {
 
 try{
 
+    # start count item
+    [int]$count= 1
+
+    # set script error count
+    [int]$scriptError = 0
+
     # Create New-Registry Key
     New-Item –Path "HKLM:Software\CommunityHelper" –Name PostInstall -Force
 
     # Set Status Flag
     New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "Status" -Value ”Inprogress” -PropertyType "String" -Force
 
-    # Set PackageCount
-    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCount" -Value $count -PropertyType "String" -Force
-
     # Set PackageCountTotal
     New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCountTotal" -Value $packageList.Count -PropertyType "String" -Force
+    
+    # Set Intial PackageCountPercentage
+    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCountPercentage" -Value 0 -PropertyType "String" -Force
 
     # Set Package Error Count
     New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageErrorCount" -Value $scriptError -PropertyType "String" -Force
@@ -95,24 +101,14 @@ try{
     # Set LogFile FilePath
     New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "LogFile" -Value $Logfile -PropertyType "String" -Force
 
-    # Set PackageCount Intial Value
-    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCount" -Value 0 -PropertyType "String" -Force
-
-    # Set PackageCountPercentage
-    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCountPercentage" -Value ([math]::Round(($count/$packageList.Count)*100)) -PropertyType "String" -Force
-
-    # start count item
-    [int]$count= 1
-
-    # set script error count
-    [int]$scriptError = 0
-
     # For Each Application in install list
     foreach($package in $packageList.GetEnumerator()) {
 
     # Set PackageName
     New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageName" -Value $package.Name -PropertyType "String" -Force
 
+    # Set PackageCount
+    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCount" -Value $count -PropertyType "String" -Force
 
     # Build package full file path
     $packagePath = join-path -path $PackageRootFolder -ChildPath $($package.FolderPath)
@@ -184,9 +180,6 @@ try{
         New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageErrorCount" -Value $scriptError -PropertyType "String" -Force
 
         }
-
-    # Set PackageCount
-    New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCount" -Value $count -PropertyType "String" -Force
 
     # Set PackageCountPercentage
     New-ItemProperty -Path "HKLM:Software\CommunityHelper\PostInstall" -Name "PackageCountPercentage" -Value ([math]::Round(($count/$packageList.Count)*100)) -PropertyType "String" -Force

@@ -1,7 +1,19 @@
-﻿# The fresh look to the summary screen, has come from me hijacking the awesome splash screen from Trevor Joneshttps://smsagent.blog/2018/08/21/create-a-custom-splash-screen-for-a-windows-10-in-place-upgrade/ 
-# and adapted it to work here along with the incredible tools provided by https://mahapps.com/
+﻿##################################################################       Comments        ##################################################################
+<#
+.SYNOPSIS
+     A splash screen to run installation packages post Operating System Deployment, vSphere Template Deployment etc.  Check out https://ourcommunityhelper.com/2021/01/13/vmware-vsphere-post-install-customization/ 
 
-# Create a new PS process to call the "Spawn-Packages.ps1" and "Spawn-SplashScreen.ps1" script to prevennt the splash screen from blocking the installation script
+.DESCRIPTION
+    The fresh look to the Splash Screen, has come from me hijacking the awesome splash screen from Trevor Joneshttps://smsagent.blog/2018/08/21/create-a-custom-splash-screen-for-a-windows-10-in-place-upgrade/ 
+    and adapted it to work alongside the incredible tools provided by https://mahapps.com/
+
+.EXAMPLE
+
+.NOTES
+    Author     : STEVEN DRAKE
+    Version    : 12 Feb  2021 - Removed additional ticker in Spawn-SplashScreen.ps1 and changed Progress to sTEP x of x in Spawn-Packages.ps1
+#>
+##################################################################  Set Startup Parameters  ##################################################################
 
 # Enable Cleanup and Restart
 $CleanupAndRestart = $False
