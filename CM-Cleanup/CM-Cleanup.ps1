@@ -1,21 +1,23 @@
 ﻿<#
 .SYNOPSIS
-    This script will export a .csv file showing all applications and packages that are not in use within Configuration Manager
+    This script will export a .csv file showing all applications and packages that are not in use within Configuration Manage
 
 .DESCRIPTION
    Connect to your Configuration Manger PowerShell Console and execute. A .csv file of all applications and packages that are not in use
-   will be written to C:\Windows\Temp\SCCM_Apps.csv and C:\Windows\Temp\SCCM_Pacakes.csv
+   will be written to C:\Windows\Temp\CM_Apps.csv and C:\Windows\Temp\CM_Packages.csv
 
 .NOTES
     The original author was Matt Bobke : https://mattbobke.com/2018/05/06/finding-unused-sccm-applications-and-packages/ and enhancements by Skatterbrainz
+    and has since been updated by S.P.Drake
 
-    Since its has been updated by
-    File Name      : SCCM - Cleanup.ps1
+    Full functionality requires PowerShell 5.0 +
+
+    File Name      : CM - Cleanup.ps1
     Author         : S.P.Drake
+    Version        : 1.1  : Added content distribution count, package type translation and powershell compatibility
     Version        : 1.0  : Enhanced package filter, exclude predefined packages, Configuration Manager Client Piloting Package and DefaultImages and dependant programs
 
 #>
-
 
 # Assign report folder
 $ReportFolder = "$env:systemdrive\Windows\Temp"
@@ -23,82 +25,117 @@ $ReportFolder = "$env:systemdrive\Windows\Temp"
 # Suppress Fast check not in use warning message
 $CMPSSuppressFastNotUsedCheck = $true
 
-Write-Host "Get - applications" -ForegroundColor Cyan
+Write-Verbose "Get - distribution points and package content" -Verbose
 
-# Grab all Applications, IsDeployed=False, NumberofDependentTS=0, NumberofDependentDTs=0 applications (can't filter packages like applications)
-$FinalApplications = Get-CMApplication -Fast | Where-Object {($_.IsDeployed -eq $False) -and ($_.NumberofDependentTS -eq 0) -and ($_.NumberofDependentDTs -eq 0)}
+# Initialise $packageContentCount array
+$packageContentCount = @()
 
-Write-Host "Get - packages" -ForegroundColor Cyan
+# Get all distribution points servers
+$allDPs = Get-CMDistributionPointInfo | Select-Object -ExpandProperty ServerName
 
-# Grab all Regular Packages, IsPredefinedPackage=False and Name -ne 'Configuration Manager Client Piloting Package' packages
-$RegularPackage = Get-CMPackage -Fast -PackageType RegularPackage | Where-Object {($_.IsPredefinedPackage -eq $false -and ($_.Name -ne 'Configuration Manager Client Piloting Package'))}
+# Get the content on each distribution pint
+foreach ($dp in $allDPs){
 
-# Grab all Driver Packages
-$DriverPackage = Get-CMPackage -Fast -PackageType Driver
+    $packageContentCount += Get-CMDeploymentPackage -DistributionPointName $dp | Select-Object -ExpandProperty PackageID }
 
-# Grab all Operating System Image packages
-$ImageDeploymentPackage = Get-CMPackage -Fast -PackageType ImageDeployment
+# Group the content found on each distribution point to get a package distributed total count
+$groupedPackageContentCount  = $packageContentCount | Sort-Object $_.Name | Group-Object $_.Name
 
-# Grab all Operating System Upgrade packages
-$OSInstallPackagePackage = Get-CMPackage -Fast -PackageType OSInstallPackage
+Write-Verbose "Get - applications" -Verbose
 
-# Grab all Boot Image packages, DefaultImage=False
-$BootImagePackage = Get-CMPackage -Fast -PackageType BootImage | Where-Object {$_.DefaultImage -eq $false}
+# Get all Applications that are not deployed, have no dependant task sequences and no deployment types that depend on this application - (can't filter packages like applications)
+$AllApplications = Get-CMApplication | Where-Object {($_.IsDeployed -eq $False) -and ($_.NumberofDependentTS -eq 0) -and ($_.NumberofDependentDTs -eq 0)}
 
-# Combine all applictaions and packages into one list
-$AllPackages = ($RegularPackage + $DriverPackage + $ImageDeploymentPackage + $OSInstallPackagePackage + $BootImagePackage)
+Write-Verbose "Get - packages" -Verbose
 
-Write-Host "Get - deployments" -ForegroundColor Cyan
+# Get running PowerShell version - Function limited to version
+If ($PSVersionTable.PSVersion.Major -ge 5){
 
-# Grab all deployments, filter to just a list of their package IDs
-$DeploymentPackageIDs = Get-CMDeployment | Select-Object PackageID | Sort-Object PackageID | Get-Unique -AsString
+    # Get all Regular Packages that are not predefined packages and package name not 'Configuration Manager Client Piloting Package'
+    $RegularPackage = Get-CMPackage -Fast -PackageType RegularPackage | Where-Object {($_.IsPredefinedPackage -eq $false) -or ($_.Name -ne 'Configuration Manager Client Piloting Package')}
 
-Write-Host "Get - task sequences" -ForegroundColor Cyan
+    # Get all Driver Packages
+    $DriverPackage = Get-CMPackage -Fast -PackageType Driver
 
-# Grab all task sequences, References -ne $null, TsEnabled -ne $false (can not use -Fast)
-$FilteredTaskSequences = Get-CMTaskSequence | Where-Object { $_.References -ne $null -and $_.TsEnabled -ne $false }
+    # Get all Operating System Image packages
+    $ImageDeploymentPackage = Get-CMPackage -Fast -PackageType ImageDeployment
+
+    # Get all Operating System Upgrade packages
+    $OSInstallPackagePackage = Get-CMPackage -Fast -PackageType OSInstallPackage
+
+    # Get all Boot Image packages, DefaultImage=False
+    $BootImagePackage = Get-CMPackage -Fast -PackageType BootImage | Where-Object {$_.DefaultImage -eq $false}
+
+    # Combine all packages lists together
+    $AllPackages = ($RegularPackage + $DriverPackage + $ImageDeploymentPackage + $OSInstallPackagePackage + $BootImagePackage)}
+
+    else{
+
+    # Get all Regular Packages that are not predefined packages and package name not 'Configuration Manager Client Piloting Package'
+    $AllPackages = Get-CMPackage -Fast | Where-Object {($_.IsPredefinedPackage -eq $false) -or ($_.Name -ne 'Configuration Manager Client Piloting Package')}
+
+    }
+
+Write-Verbose "Get - deployments" -Verbose
+
+# Get all deployments, filter to just a list of their package IDs
+$DeploymentPackageIDs = Get-CMDeployment | Select-Object PackageID | Sort-Object | Get-Unique -AsString
+
+Write-Verbose "Get - task sequences" -Verbose
+
+# Get all task sequences that have references and not disabled (cannot use -Fast)
+$FilteredTaskSequences = Get-CMTaskSequence | Where-Object { ($_.References -ne $null) -and ($_.TsEnabled -ne $false) }
 
 # If filtered task Sequence found
 if ($FilteredTaskSequences.Count -ne 0) {
 
-    Write-Host "Filter - task sequence references only" -ForegroundColor Cyan
+    Write-Verbose "Filter - task sequence references only" -Verbose
 
-    # Filter task sequnces to just a list of their references (can not use -Fast)
+    # Filter task sequences to just a list of their references (cannot use -Fast)
     $TSReferences = ( $FilteredTaskSequences | Select-Object References).References.Package | Sort-Object | Get-Unique -AsString
 
-    Write-Host "Filter - task sequence dependant programs only " -ForegroundColor Cyan
+    Write-Verbose "Filter - task sequence dependant programs only " -Verbose
 
-    # Filter task Sequences dependant programs, filter to just a list of their references (can not use -Fast)
+    # Filter task Sequence’s dependant programs, filter to just a list of their references (cannot use -Fast)
     $TSDependentProgram = $FilteredTaskSequences | Select-Object DependentProgram | Foreach-Object {$_.DependentProgram.Split(';;')[0]} | Sort-Object | Get-Unique -AsString
 }
 
+Write-Verbose "Filter - applications and packages that are not active" -Verbose
 
-Write-Host "Filter - applications and packages that are not active" -ForegroundColor Cyan
+# Initialise FinalApplications
+$FinalApplications = New-Object -TypeName 'System.Collections.ArrayList'
 
-# Initialise FinalPackages
+# Initialise FinalPackage
 $FinalPackages = New-Object -TypeName 'System.Collections.ArrayList'
 
-# Filter packages to only those that do not have their PackageID in the list of references
-foreach ($package in $AllPackages) {
-    if (($package.PackageID -notin $TSReferences -and $package.PackageID -notin $DeploymentPackageIDs -and $package.PackageID -notin $TSDependentProgram )) {
-        $FinalPackages.Add($package) | Out-Null
+# Append content distribution count to the application list
+foreach ($App in $AllApplications) {
+        $App | Add-Member -MemberType NoteProperty DPCount -Value ($groupedPackageContentCount | Where-Object {$_.Name -eq $App.PackageID} | Select-Object -ExpandProperty count)
+        $FinalApplications.Add($App) | Out-Null
+}
+
+# Filter packages to only those that do not have their PackageID in the list of references and append content distribution count to the package list
+foreach ($Package in $AllPackages) {
+    if (($Package.PackageID -notin $TSReferences) -and ($Package.PackageID -notin $DeploymentPackageIDs.PackageID) -and ($Package.PackageID -notin $TSDependentProgram)) {
+        $Package | Add-Member -MemberType NoteProperty DPCount -Value ($groupedPackageContentCount | Where-Object {$_.Name -eq $Package.PackageID} | Select-Object -ExpandProperty count)
+        $FinalPackages.Add($Package) | Out-Null
     }
 }
 
-Write-Host "Export - applications and packages that are not active" -ForegroundColor Cyan
+Write-Verbose "Export - applications and packages that are not active" -Verbose
 
 # Export application list to .csv
 $FinalApplications `
-    | Select-Object -Property LocalizedDisplayName, PackageID, DateCreated, DateLastModified, IsDeployable, IsEnabled, IsExpired, IsHidden, IsSuperseded `
+    | Select-Object -Property LocalizedDisplayName, PackageID, DateCreated, DateLastModified, IsDeployable, IsEnabled, IsExpired, IsHidden, IsSuperseded, DPCount  `
     | Sort-Object -Property LocalizedDisplayName `
-    | Export-Csv -Path "$ReportFolder\SCCM_Apps.csv" -NoTypeInformation
+    | Export-Csv -Path "$ReportFolder\CM_Apps.csv" -NoTypeInformation
 
 # Export package list to .csv
 $FinalPackages `
-    | Select-Object Name, PackageType, PackageID, SourceDate, LastRefreshTime, PkgSourcePath `
+    | Select-Object Name, @{Name = "PackageType";Expression = {$_.PackageType -replace '258','BootImage' -replace '3','Driver' -replace '257','ImageDeployment' -replace '259','OSInstallPackage' -replace '0','RegularPackage'}},PackageID, SourceDate, LastRefreshTime, PkgSourcePath, DPCount `
     | Sort-Object -Property PackageType, Name `
-    | Export-Csv -Path "$ReportFolder\SCCM_Packages.csv" -NoTypeInformation
+    | Export-Csv -Path "$ReportFolder\CM_Packages.csv" -NoTypeInformation
 
-Write-Host "Done! CSVs stored in $ReportFolder" -ForegroundColor Green
+Write-Verbose "Done - CSVs stored in $ReportFolder" -Verbose
 
-# Future releases will have the option for Report Only, Prompt On Delete, or Auto Delete
+# Future releases will have the option for Report Only, Prompt on Delete, or Auto Delete
