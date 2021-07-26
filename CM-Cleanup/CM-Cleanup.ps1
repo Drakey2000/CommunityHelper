@@ -8,8 +8,9 @@
 
 .NOTES
     The original author was Matt Bobke : https://mattbobke.com/2018/05/06/finding-unused-sccm-applications-and-packages/ and enhancements by Skatterbrainz
+    and has since been updated by S.P.Drake
 
-    Full functionality requires ConfigurationManager 5.0 + and has since been updated by
+    Full functionality requires Configuration Manager Release 2010 or later 
 
     File Name      : CM - Cleanup.ps1
     Author         : S.P.Drake
