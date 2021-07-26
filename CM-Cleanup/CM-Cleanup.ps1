@@ -8,13 +8,12 @@
 
 .NOTES
     The original author was Matt Bobke : https://mattbobke.com/2018/05/06/finding-unused-sccm-applications-and-packages/ and enhancements by Skatterbrainz
-    and has since been updated by S.P.Drake
 
-    Full functionality requires PowerShell 5.0 +
+    Full functionality requires ConfigurationManager 5.0 + and has since been updated by
 
     File Name      : CM - Cleanup.ps1
     Author         : S.P.Drake
-    Version        : 1.1  : Added content distribution count, package type translation and powershell compatibility
+    Version        : 1.1  : Added content distribution count, package type translation and ConfigurationManager compatibility
     Version        : 1.0  : Enhanced package filter, exclude predefined packages, Configuration Manager Client Piloting Package and DefaultImages and dependant programs
 
 #>
@@ -48,8 +47,8 @@ $AllApplications = Get-CMApplication | Where-Object {($_.IsDeployed -eq $False) 
 
 Write-Verbose "Get - packages" -Verbose
 
-# Get running PowerShell version - Function limited to version
-If ($PSVersionTable.PSVersion.Major -ge 5){
+# If running ConfigurationManager version 2010 or later
+If ((Get-Module -Name ConfigurationManager).Version.Major -ge 5 -and (Get-Module -Name ConfigurationManager).Version.Minor -ge 2010){
 
     # Get all Regular Packages that are not predefined packages and package name not 'Configuration Manager Client Piloting Package'
     $RegularPackage = Get-CMPackage -Fast -PackageType RegularPackage | Where-Object {($_.IsPredefinedPackage -eq $false) -or ($_.Name -ne 'Configuration Manager Client Piloting Package')}
