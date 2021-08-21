@@ -6,7 +6,7 @@
     Warning Destructive - Created to run in WinPE OSD to Clear-Disk and assign OSDDiskIndex to task sequence Disk Advanced Option Partition Variable
 
 .DESCRIPTION
-    Runs in WinPE OSD to find, sort and format disk drive(s) and assign fastest and smallest disk as OSDDiskIndex variable to be used in the
+    Runs in WinPE OSD to find all non USB Bus Types, format disk drive(s) and assign smallest disk as OSDDiskIndex variable to be used in the
     task sequence
 
 .NOTES
@@ -63,8 +63,8 @@ if ($TSEnv.Value('_SMSTSBootUEFI') -eq $True){$Style = 'GPT'} else {$Style = 'MB
 Write-Log -Message  "All BusTypes excluding USB are searched"
 Write-Log
 
-# Get only physical disks that are not BusType USB
-$physicalDisks = Get-PhysicalDisk | Where-Object -FilterScript {$_.Bustype -ne 'USB'}
+# Get only physical disks that are not BusType USB and order by size (smallest to largest)
+$physicalDisks = Get-PhysicalDisk | Where-Object {$_.Bustype -ne 'USB'} | Sort-Object -Property @{Expression = "Size"; Descending = $False}
 
     # Did we find any matching physical disks ?
     if ($null-eq $physicalDisks) {
