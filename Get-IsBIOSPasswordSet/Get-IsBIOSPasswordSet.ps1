@@ -11,6 +11,7 @@
 
     File Name      : Get-IsBIOSPasswordSet.ps1
     Author         : S.P.Drake
+    Website        : https://ourcommunityhelper.com
     Version        : 1.0  : Initial version
 #>
 
