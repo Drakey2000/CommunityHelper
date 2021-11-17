@@ -3,7 +3,7 @@
     Enables you to export a list of Windows Packages before and then after and automatically compares the two
 
 .DESCRIPTION
-    Compare-Drivers is a function that returns all Windows Packages and compare the versions before and after installation
+    Compare-WindowsPackages is a function that returns all Windows Packages and compare the versions before and after installation
 
 .PARAMETER Action
     The Compare-WindowsPackages Action you are running, either Pre-Update or Post-Update
@@ -21,9 +21,11 @@
     WindowsPackages-Difference.log   (comma-separated)
 
 .NOTES
-    Author:  Steven Drake
-    Website: https://ourcommunityhelper.com/
-    Version: 1.0
+     Author : Steven Drake
+    Website : https://ourcommunityhelper.com/
+    Version
+        1.1 : Expanded compare object grouping
+        1.0 : Initial release
 #>
 
 
@@ -68,25 +70,19 @@ Try{
             # Export Packages - XML Machine Reading
             $Packages | Export-Clixml $BeforeFilePath -Force
 
-            # Export Packages - Log Human Reading
-            # $Packages | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
-
             }else{
 
             # Export Packages - XML Machine Reading
             $Packages | Export-Clixml $AfterFilePath -Force
 
-            # Export Packages - Log Human Reading
-            # $Packages | Out-File  ($AfterFilePath).Replace('.xml','.log') -Force
-
             # Delete exisiting Drivers-Difference.csv
             If(Test-Path -Path $ComparisonFilePath){Remove-Item $ComparisonFilePath -Force}
 
             # Add Headers to .csv File
-            Add-Content -Path $ComparisonFilePath -value "Name,Package Name,Release Type,Install Time,Pre-Update,Post-Update,Status"
+            Add-Content -Path $ComparisonFilePath -value "Friendly Name,Package Name,Release Type,Install Time,Pre-Update,Post-Update,Status"
 
             # Compare the Drivers Pre-Update and Post-Update and Group On Unique ID PackageName
-            $Differences = Compare-Object -ReferenceObject (Import-Clixml $BeforeFilePath) -DifferenceObject (Import-Clixml $AfterFilePath) -Property PackageName,PackageState,ReleaseType,InstallTime -IncludeEqual | Sort-Object PackageName | Group-Object @{expression={$_.PackageName.Substring(0,$_.PackageName.IndexOf('~'))}}
+            $Differences = Compare-Object -ReferenceObject (Import-Clixml $BeforeFilePath) -DifferenceObject (Import-Clixml $AfterFilePath) -Property PackageName,PackageState,ReleaseType,InstallTime -IncludeEqual | Sort-Object PackageName | Group-Object @{expression={$_.PackageName.Substring(0,$_.PackageName.LastIndexOf($_.PackageName.Split('~')[4])-1)}}
 
             # For Each Comparison Group - Append to Log
             ForEach($Diff in $Differences){
