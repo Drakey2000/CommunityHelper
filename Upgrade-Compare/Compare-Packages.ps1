@@ -21,9 +21,11 @@
     WindowsPackages-Difference.csv
 
 .NOTES
-    Author:  Steven Drake
-    Website: https://ourcommunityhelper.com
-    Version: 1.0
+     Author : Steven Drake
+    Website : https://ourcommunityhelper.com/
+    Version
+        1.1 : Hardcoded log file name, so it can be used from .ps1 or embedded PowerShell in a Task Sequence
+        1.0 : Initial release
 #>
 
 
@@ -38,8 +40,8 @@
 # Main Try Catch
 Try{
 
-    # Get Script Name - Without Extention
-    $FileName = (Get-Item $PSCommandPath).Basename
+        # Get Script Name - Without Extention
+    $FileName = "_Compare-Packages"
 
     # Set Log File
     $LogFolder = "$($env:windir)\CCM\Logs"
@@ -48,16 +50,16 @@ Try{
     New-Item -Path $LogFolder -ItemType Directory -Force
 
     # Set Driver-Before File Path
-    $BeforeFilePath = "$LogFolder\_$FileName-Before.xml"
+    $BeforeFilePath = "$LogFolder\$FileName-Before.xml"
 
     # Set Driver-After File Path
-    $AfterFilePath = "$LogFolder\_$FileName-After.xml"
+    $AfterFilePath = "$LogFolder\$FileName-After.xml"
 
     # Set Driver-Difference File Path
-    $ComparisonFilePath = "$LogFolder\_$FileName-Difference.log"
+    $ComparisonFilePath = "$LogFolder\$FileName-Difference.log"
 
     # Set Log File
-    $LogFile = "$LogFolder\_$FileName.log"
+    $LogFile = "$LogFolder\$FileName.log"
 
     # Get Packages
     $Packages = Get-Package | Select-Object Name,Version,Status
@@ -69,7 +71,7 @@ Try{
             $Packages | Export-Clixml $BeforeFilePath -Force
 
             # Export Packages - Log Human Reading
-            # $Packages | Format-List | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
+            $Packages | Format-List | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
 
             }else{
 
@@ -77,7 +79,7 @@ Try{
             $Packages | Export-Clixml $AfterFilePath -Force
 
             # Export Packages - Log Human Reading
-            # $Packages | Format-List | Out-File ($AfterFilePath).Replace('.xml','.log') -Force
+            $Packages | Format-List | Out-File ($AfterFilePath).Replace('.xml','.log') -Force
 
             # Delete exisiting Packages-Difference.csv
             If(Test-Path -Path $ComparisonFilePath){Remove-Item $ComparisonFilePath -Force}

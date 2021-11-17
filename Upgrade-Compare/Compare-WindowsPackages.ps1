@@ -41,7 +41,7 @@
 Try{
 
     # Get Script Name - Without Extention
-    $FileName = "_" + (Get-Item $PSCommandPath).Basename
+    $FileName = "_Compare-WindowsPackages"
 
     # Set Log File
     $LogFolder = "$($env:windir)\CCM\Logs"

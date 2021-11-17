@@ -21,9 +21,11 @@
     Drivers-Difference.csv    (comma-separated)
 
 .NOTES
-    Author:  Steven Drake
-    Website: https://ourcommunityhelper.com
-    Version: 1.0
+     Author : Steven Drake
+    Website : https://ourcommunityhelper.com/
+    Version
+        1.1 : Hardcoded log file name, so it can be used from .ps1 or embedded PowerShell in a Task Sequence
+        1.0 : Initial release
 
 #>
 
@@ -40,7 +42,7 @@
 Try{
 
     # Get Script Name - Without Extention
-    $FileName = (Get-Item $PSCommandPath).Basename
+    $FileName = "_Compare-Drivers"
 
     # Set Log File
     $LogFolder = "$($env:windir)\CCM\Logs"
@@ -49,16 +51,16 @@ Try{
     New-Item -Path $LogFolder -ItemType Directory -Force
 
     # Set Driver-Before File Path
-    $BeforeFilePath = "$LogFolder\_$FileName-Before.xml"
+    $BeforeFilePath = "$LogFolder\$FileName-Before.xml"
 
     # Set Driver-After File Path
-    $AfterFilePath = "$LogFolder\_$FileName-After.xml"
+    $AfterFilePath = "$LogFolder\$FileName-After.xml"
 
     # Set Driver-Difference File Path
-    $ComparisonFilePath = "$LogFolder\_$FileName-Difference.log"
+    $ComparisonFilePath = "$LogFolder\$FileName-Difference.log"
 
     # Set Log File
-    $LogFile = "$LogFolder\_$FileName.log"
+    $LogFile = "$LogFolder\$FileName.log"
 
         # Get Windows Third Party Drivers Only
         $WindowsDrivers = Get-WindowsDriver -Online | Select-Object *
@@ -70,7 +72,7 @@ Try{
             $WindowsDrivers | Export-Clixml $BeforeFilePath -Force
 
             # Export Third Party Drivers Only - Log Human Reading
-            # $WindowsDrivers | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
+            $WindowsDrivers | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
 
             }else{
 
@@ -78,7 +80,7 @@ Try{
             $WindowsDrivers | Export-Clixml $AfterFilePath -Force
 
             # Export Third Party Drivers Only - Log Human Reading
-            # $WindowsDrivers | Out-File ($AfterFilePath).Replace('.xml','.log') -Force
+            $WindowsDrivers | Out-File ($AfterFilePath).Replace('.xml','.log') -Force
 
             # Delete exisiting Drivers-Difference.csv
             If(Test-Path -Path $ComparisonFilePath){Remove-Item $ComparisonFilePath -Force}
