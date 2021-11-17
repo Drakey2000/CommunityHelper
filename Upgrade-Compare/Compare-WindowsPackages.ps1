@@ -40,54 +40,54 @@
 # Main Try Catch
 Try{
 
-    # Get Script Name - Without Extention
+    # Set Filename
     $FileName = "_Compare-WindowsPackages"
 
-    # Set Log File
+    # Set Log Folder
     $LogFolder = "$($env:windir)\CCM\Logs"
 
     # Create Log Folder
     New-Item -Path $LogFolder -ItemType Directory -Force
 
-    # Set Driver-Before File Path
+    # Set WindowsPackages-Before File Path
     $BeforeFilePath = "$LogFolder\$FileName-Before.xml"
 
-    # Set Driver-After File Path
+    # Set WindowsPackages-After File Path
     $AfterFilePath = "$LogFolder\$FileName-After.xml"
 
-    # Set Driver-Difference File Path
+    # Set WindowsPackages-Difference File Path
     $ComparisonFilePath = "$LogFolder\$FileName-Difference.log"
 
-    # Set Log File
+    # Set Error Log File
     $LogFile = "$LogFolder\$FileName.log"
 
     # Get Windows Packages
     $Packages = Get-WindowsPackage -Online | Where-Object {$_.PackageState -eq 'Installed'}
 
-        # Processing Pre-Update Drivers ?
+        # Processing Pre-Update Packages ?
         If($Action  -eq "Pre-Update"){
 
-            # Export Packages - XML Machine Reading
+            # Export WindowsPackage - XML Machine Reading
             $Packages | Export-Clixml $BeforeFilePath -Force
 
-            # Export Packages - Log Human Reading
+            # Export WindowsPackage - Log Human Reading
             $Packages | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
 
             }else{
 
-            # Export Packages - XML Machine Reading
+            # Export WindowsPackage - XML Machine Reading
             $Packages | Export-Clixml $AfterFilePath -Force
 
-            # Export Packages - Log Human Reading
+            # Export WindowsPackage - Log Human Reading
             $Packages | Out-File  ($AfterFilePath).Replace('.xml','.log') -Force
 
-            # Delete exisiting Drivers-Difference.csv
+            # Delete exisiting WindowsPackages-Difference.csv
             If(Test-Path -Path $ComparisonFilePath){Remove-Item $ComparisonFilePath -Force}
 
             # Add Headers to .csv File
             Add-Content -Path $ComparisonFilePath -value "Friendly Name,Package Name,Release Type,Install Time,Pre-Update,Post-Update,Status"
 
-            # Compare the Drivers Pre-Update and Post-Update and Group On Unique ID PackageName
+            # Compare the WindowsPackages Pre-Update and Post-Update and Group On Unique ID PackageName
             $Differences = Compare-Object -ReferenceObject (Import-Clixml $BeforeFilePath) -DifferenceObject (Import-Clixml $AfterFilePath) -Property PackageName,PackageState,ReleaseType,InstallTime -IncludeEqual | Sort-Object PackageName | Group-Object @{expression={$_.PackageName.Substring(0,$_.PackageName.LastIndexOf($_.PackageName.Split('~')[4])-1)}}
 
             # For Each Comparison Group - Append to Log

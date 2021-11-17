@@ -40,31 +40,31 @@
 # Main Try Catch
 Try{
 
-        # Get Script Name - Without Extention
+    # Set Filename
     $FileName = "_Compare-Packages"
 
-    # Set Log File
+    # Set Log Folder
     $LogFolder = "$($env:windir)\CCM\Logs"
 
     # Create Log Folder
     New-Item -Path $LogFolder -ItemType Directory -Force
 
-    # Set Driver-Before File Path
+    # Set Packages-Before File Path
     $BeforeFilePath = "$LogFolder\$FileName-Before.xml"
 
-    # Set Driver-After File Path
+    # Set Packages-After File Path
     $AfterFilePath = "$LogFolder\$FileName-After.xml"
 
-    # Set Driver-Difference File Path
+    # Set Packages-Difference File Path
     $ComparisonFilePath = "$LogFolder\$FileName-Difference.log"
 
-    # Set Log File
+    # Set Error Log File
     $LogFile = "$LogFolder\$FileName.log"
 
     # Get Packages
     $Packages = Get-Package | Select-Object Name,Version,Status
 
-        # Processing Pre-Update Drivers ?
+        # Processing Pre-Update Packages ?
         If($Action  -eq "Pre-Update"){
 
             # Export Packages - XML Machine Reading
