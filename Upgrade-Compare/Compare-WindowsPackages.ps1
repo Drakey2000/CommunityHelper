@@ -41,7 +41,7 @@
 Try{
 
     # Get Script Name - Without Extention
-    $FileName = (Get-Item $PSCommandPath).Basename
+    $FileName = "_" + (Get-Item $PSCommandPath).Basename
 
     # Set Log File
     $LogFolder = "$($env:windir)\CCM\Logs"
@@ -50,16 +50,16 @@ Try{
     New-Item -Path $LogFolder -ItemType Directory -Force
 
     # Set Driver-Before File Path
-    $BeforeFilePath = "$LogFolder\_$FileName-Before.xml"
+    $BeforeFilePath = "$LogFolder\$FileName-Before.xml"
 
     # Set Driver-After File Path
-    $AfterFilePath = "$LogFolder\_$FileName-After.xml"
+    $AfterFilePath = "$LogFolder\$FileName-After.xml"
 
     # Set Driver-Difference File Path
-    $ComparisonFilePath = "$LogFolder\_$FileName-Difference.log"
+    $ComparisonFilePath = "$LogFolder\$FileName-Difference.log"
 
     # Set Log File
-    $LogFile = "$LogFolder\_$FileName.log"
+    $LogFile = "$LogFolder\$FileName.log"
 
     # Get Windows Packages
     $Packages = Get-WindowsPackage -Online | Where-Object {$_.PackageState -eq 'Installed'}
@@ -70,10 +70,16 @@ Try{
             # Export Packages - XML Machine Reading
             $Packages | Export-Clixml $BeforeFilePath -Force
 
+            # Export Packages - Log Human Reading
+            $Packages | Out-File ($BeforeFilePath).Replace('.xml','.log') -Force
+
             }else{
 
             # Export Packages - XML Machine Reading
             $Packages | Export-Clixml $AfterFilePath -Force
+
+            # Export Packages - Log Human Reading
+            $Packages | Out-File  ($AfterFilePath).Replace('.xml','.log') -Force
 
             # Delete exisiting Drivers-Difference.csv
             If(Test-Path -Path $ComparisonFilePath){Remove-Item $ComparisonFilePath -Force}
