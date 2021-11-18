@@ -18,11 +18,11 @@
     String
 
 .OUTPUTS
-    WindowsPackages-Difference.log   (comma-separated)
+    Compare-WindowsPackages-Difference.log   (comma-separated)
 
 .NOTES
      Author : Steven Drake
-    Website : https://ourcommunityhelper.com/
+    Website : https://ourcommunityhelper.com
     Version
         1.1 : Expanded compare object grouping
         1.0 : Initial release

@@ -3,10 +3,10 @@
     Enables you to export a list of drivers before and then after and automatically compares the two
 
 .DESCRIPTION
-    Export-Drivers is a function that returns all third-party drivers and compare the versions before and after installation
+    Compare-Drivers is a function that returns all third-party drivers and compare the versions before and after installation
 
 .PARAMETER State
-    The Driver-Export State you are running, either Pre-Update or Post-Update
+    The Compare-Drivers State you are running, either Pre-Update or Post-Update
 
 .EXAMPLE
      .\Compare-Drivers.ps1 -Action Pre-Update
@@ -18,11 +18,11 @@
     String
 
 .OUTPUTS
-    Drivers-Difference.csv    (comma-separated)
+    Compare-Drivers-Difference.csv    (comma-separated)
 
 .NOTES
      Author : Steven Drake
-    Website : https://ourcommunityhelper.com/
+    Website : https://ourcommunityhelper.com
     Version
         1.1 : Hardcoded log file name, so it can be used from .ps1 or embedded PowerShell in a Task Sequence
         1.0 : Initial release

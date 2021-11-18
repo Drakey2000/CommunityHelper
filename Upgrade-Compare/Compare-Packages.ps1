@@ -3,10 +3,10 @@
     Enables you to export a list of Packages before and then after and automatically compares the two
 
 .DESCRIPTION
-    Compare-Drivers is a function that returns all Windows Packages and compare the versions before and after installation
+    Compare-Packages is a function that returns all Windows Packages and compare the versions before and after installation
 
 .PARAMETER Action
-    The Compare-WindowsPackages Action you are running, either Pre-Update or Post-Update
+    The Compare-Packages Action you are running, either Pre-Update or Post-Update
 
 .EXAMPLE
      .\Compare-Packages.ps1 -Action Pre-Update
@@ -18,11 +18,11 @@
     String
 
 .OUTPUTS
-    WindowsPackages-Difference.csv
+    Compare-Packages-Difference.csv
 
 .NOTES
      Author : Steven Drake
-    Website : https://ourcommunityhelper.com/
+    Website : https://ourcommunityhelper.com
     Version
         1.1 : Hardcoded log file name, so it can be used from .ps1 or embedded PowerShell in a Task Sequence
         1.0 : Initial release
