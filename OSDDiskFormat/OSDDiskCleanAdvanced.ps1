@@ -14,6 +14,10 @@
     Website        : https://ourcommunityhelper.com
     Author         : S.P.Drake
 
+    Version
+         1.1       : Added No physical disks have been detected Error Code
+         1.0       : Inital version
+
 .COMPONENT
     (WinPE-EnhancedStorage),Windows PowerShell (WinPE-StorageWMI),Microsoft .NET (WinPE-NetFx),Windows PowerShell (WinPE-PowerShell). Need to
     added to the WinPE Boot Image to enable the script to run
@@ -71,9 +75,11 @@ Write-Log
 $physicalDisks = Get-PhysicalDisk | where-object{$diskorder -match $_.BusType} | Sort-Object {$diskorder.IndexOf($_.BusType)} , @{Expression = "Size"; Descending = $False}
 
     # Did we find any matching physical disks ?
-    if ($null-eq $physicalDisks) {
+    if ($null -eq $physicalDisks) {
         Write-Log -Message "No physical disks have been detected"
         Write-Log
+        Write-Log -Level ERROR -Message "Exit Code 0x0000000F : ERROR_INVALID_DRIVE"
+        Exit 0xF
     }
     else {
         Write-Log -Message "The following physical disks have been detected: -"
