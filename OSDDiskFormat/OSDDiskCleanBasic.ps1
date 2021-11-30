@@ -15,8 +15,8 @@
     Author         : S.P.Drake
 
     Version
-         1.1       : Added No physical disks have been detected' Error Code
-         1.0       : Inital version
+         1.1       : Added 'No physical disks have been detected' Error Code
+         1.0       : Initial version
 
 .COMPONENT
     (WinPE-EnhancedStorage),Windows PowerShell (WinPE-StorageWMI),Microsoft .NET (WinPE-NetFx),Windows PowerShell (WinPE-PowerShell). Need to
