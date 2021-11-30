@@ -59,6 +59,9 @@ Function Write-Log {
 # Outer Try Catch
 try{
 
+# Create PhysicalDisks array
+$physicalDisks = @()
+
 # Import Microsoft.SMS.TSEnvironment
 $TSEnv = New-Object -COMObject Microsoft.SMS.TSEnvironment
 
@@ -72,7 +75,7 @@ Write-Log
 $physicalDisks = Get-PhysicalDisk | Where-Object {$_.Bustype -ne 'USB'} | Sort-Object -Property @{Expression = "Size"; Descending = $False}
 
     # Did we find any matching physical disks ?
-    if ($null -eq $physicalDisks) {
+    if ($physicalDisks -eq 0) {
         Write-Log -Message "No physical disks have been detected"
         Write-Log
         Write-Log -Level ERROR -Message "Exit Code 0x0000000F : ERROR_INVALID_DRIVE"
