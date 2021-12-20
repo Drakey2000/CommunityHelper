@@ -3,7 +3,7 @@
     Compliments the script CM-Cleanup.ps1 and parses exported .csv and removes Packages from All Distribution Points
 
 .DESCRIPTION
-    The script will parse the Application and Package .csv exported from xxx-xxxxxxx and remove the content from all Distribution Points,
+    The script will parse the Application and Package .csv exported from CM-Cleanup.ps1 and remove the content from all Distribution Points,
     Distribution Groups and move the Configuration Manager object to the associated Object Type 'To Be Deleted' Folder
 
 .INPUTS
@@ -94,26 +94,36 @@ ForEach ($id in $RegularPackages) {
     # Remove Package From All DPs
     if($MessageResult -eq 'Yes'){
 
-        Write-Verbose "Remove - RegularPackage: $($id) : $($Package.Name) from $($allDPs)" -Verbose
+        # Array of DPs fails if Package already removed
+        ForEach ($DP in $allDPs) {
 
-        Remove-CMContentDistribution -PackageId $id -DistributionPointName $allDPs -Force
+            Write-Verbose "Remove - RegularPackage: $($id) : $($Package.Name) from $($DP)" -Verbose
 
-        Write-Verbose "Remove - RegularPackage : $($id) : $($Package.Name) from $($allDPGroups)" -Verbose
+            Remove-CMContentDistribution -PackageId $id -DistributionPointName $DP -Force
 
-        Remove-CMContentDistribution -PackageId $id -DistributionPointGroupName $allDPGroups -Force
+        }
+
+        # Array of DPs fails if Package already removed
+        ForEach ($DPGroup in $allDPGroups){
+
+            Write-Verbose "Remove - RegularPackage : $($id) : $($Package.Name) from $($DPGroup)" -Verbose
+
+            Remove-CMContentDistribution -PackageId $id -DistributionPointGroupName $DPGroup -Force
+
+        }
 
         # Move Package To Actioned Folder
         $MoveTo = "$($SiteCode):\Package\To Be Deleted"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         $MoveTo = "$($MoveTo)\$($Date)"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         if ($package.ObjectPath -notlike "*To Be Deleted*" ) {
 
-        Write-Verbose "Move - RegularPackage : $($id) : $($Package.Name) to $($MoveTo)" -Verbose
+            Write-Verbose "Move - RegularPackage : $($id) : $($Package.Name) to $($MoveTo)" -Verbose
 
             $Package | Move-CMObject -FolderPath $MoveTo
 
@@ -137,22 +147,32 @@ ForEach ($id in $DriverPackages) {
     # Remove Package From All DPs
     if($MessageResult -eq 'Yes'){
 
-        Write-Verbose "Remove - Driver : $($id) : $($Package.Name) from $($allDPs)" -Verbose
+        # Array of DPs fails if Package already removed
+        ForEach ($DP in $allDPs) {
 
-        Remove-CMContentDistribution -DriverPackageId $id -DistributionPointName $allDPs -Force
+            Write-Verbose "Remove - Driver : $($id) : $($Package.Name) from $($DP)" -Verbose
 
-        Write-Verbose "Remove - Driver : $($id) : $($Package.Name) from $($allDPGroups)" -Verbose
+            Remove-CMContentDistribution -DriverPackageId $id -DistributionPointName $DP -Force
 
-        Remove-CMContentDistribution -DriverPackageId $id  -DistributionPointGroupName $allDPGroups -Force
+        }
+
+        # Array of DPs fails if Package already removed
+        ForEach ($DPGroup in $allDPGroups){
+
+            Write-Verbose "Remove - Driver : $($id) : $($Package.Name) from $($DPGroup)" -Verbose
+
+            Remove-CMContentDistribution -DriverPackageId $id  -DistributionPointGroupName $DPGroup -Force
+
+        }
 
         # Move Package to actioned folder
         $MoveTo = "$($SiteCode):\DriverPackage\To Be Deleted"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         $MoveTo = "$($MoveTo)\$($Date)"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         if ($package.ObjectPath -notlike "*To Be Deleted*" ) {
 
@@ -179,22 +199,33 @@ ForEach ($id in $ImageDeploymentPackages) {
     # Remove Package From All DPs
     if($MessageResult -eq 'Yes'){
 
-        Write-Verbose "Remove - ImageDeployment : $($id) : $($Package.Name) from $($allDPs)" -Verbose
+        # Array of DPs fails if Package already removed
+        ForEach ($DP in $allDPs) {
 
-        Remove-CMContentDistribution -OperatingSystemImageId $id -DistributionPointName $allDPs -Force
+            Write-Verbose "Remove - ImageDeployment : $($id) : $($Package.Name) from $($DP)" -Verbose
 
-        Write-Verbose "Remove - ImageDeployment : $($id) : $($Package.Name) from $($allDPGroups)" -Verbose
+            Remove-CMContentDistribution -OperatingSystemImageId $id -DistributionPointName $DP -Force
 
-        Remove-CMContentDistribution -OperatingSystemImageId $id -DistributionPointGroupName $allDPGroups -Force
+        }
+
+        # Array of DPs fails if Package already removed
+        ForEach ($DPGroup in $allDPGroups){
+
+            Write-Verbose "Remove - ImageDeployment : $($id) : $($Package.Name) from $($DPGroup)" -Verbose
+
+            Remove-CMContentDistribution -OperatingSystemImageId $id -DistributionPointGroupName $DPGroup -Force
+
+        }
+
 
         # Move Package to actioned folder
         $MoveTo = "$($SiteCode):\OperatingSystemImage\To Be Deleted"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         $MoveTo = "$($MoveTo)\$($Date)"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         if ($package.ObjectPath -notlike "*To Be Deleted*" ) {
 
@@ -222,22 +253,32 @@ ForEach ($id in $OSInstallPackagePackages) {
     # Remove Package From All DPs
     if($MessageResult -eq 'Yes'){
 
-        Write-Verbose "Remove - OSInstallPackage : $($id) : $($Package.Name) from $($allDPs)" -Verbose
+        # Array of DPs fails if Package already removed
+        ForEach ($DP in $allDPs) {
 
-        Remove-CMContentDistribution -OperatingSystemInstallerId $id -DistributionPointName $allDPs  -Force
+            Write-Verbose "Remove - OSInstallPackage : $($id) : $($Package.Name) from $($DP)" -Verbose
 
-        Write-Verbose "Remove - OSInstallPackage : $($id) : $($Package.Name) from $($allDPGroups)" -Verbose
+            Remove-CMContentDistribution -OperatingSystemInstallerId $id -DistributionPointName $DP -Force
 
-        Remove-CMContentDistribution -OperatingSystemInstallerId $id -DistributionPointGroupName $allDPGroups -Force
+        }
+
+        # Array of DPs fails if Package already removed
+        ForEach ($DPGroup in $allDPGroups){
+
+            Write-Verbose "Remove - OSInstallPackage : $($id) : $($Package.Name) from $($DPGroup)" -Verbose
+
+            Remove-CMContentDistribution -OperatingSystemInstallerId $id -DistributionPointGroupName $DPGroup -Force
+
+        }
 
         # Move Package to actioned folder
         $MoveTo = "$($SiteCode):\OperatingSystemInstaller\To Be Deleted"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         $MoveTo = "$($MoveTo)\$($Date)"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         if ($package.ObjectPath -notlike "*To Be Deleted*" ) {
 
@@ -266,22 +307,32 @@ ForEach ($id in $BootImagePackages) {
     # Remove Package From All DPs
     if($MessageResult -eq 'Yes'){
 
-        Write-Verbose "Remove - BootImage : $($id) : $($Package.Name) from $($allDPs)" -Verbose
+        # Array of DPs fails if Package already removed
+        ForEach ($DP in $allDPs) {
 
-        Remove-CMContentDistribution  -BootImageId $id -DistributionPointName $allDPs -Force
+            Write-Verbose "Remove - BootImage : $($id) : $($Package.Name) from $($DP)" -Verbose
 
-        Write-Verbose "Remove - BootImage : $($id) : $($Package.Name) from $($allDPGroups)" -Verbose
+            Remove-CMContentDistribution  -BootImageId $id -DistributionPointName $DP -Force
 
-        Remove-CMContentDistribution -BootImageId $id -DistributionPointGroupName $allDPGroups -Force
+        }
 
-         # Move Package to actioned folder
+        # Array of DPs fails if Package already removed
+        ForEach ($DPGroup in $allDPGroups){
+
+            Write-Verbose "Remove - BootImage : $($id) : $($Package.Name) from $($DPGroup)" -Verbose
+
+            Remove-CMContentDistribution -BootImageId $id -DistributionPointGroupName $DPGroup -Force
+
+        }
+
+        # Move Package to actioned folder
         $MoveTo = "$($SiteCode):\BootImage\To Be Deleted"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         $MoveTo = "$($MoveTo)\$($Date)"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         if ($package.ObjectPath -notlike "*To Be Deleted*" ) {
 
@@ -309,22 +360,32 @@ ForEach ($id in $ApplicationPackages) {
     # Remove Package From All DPs
     if($MessageResult -eq 'Yes'){
 
-        Write-Verbose "Remove - Application : $($id) : $($Package.LocalizedDisplayName) from $($allDPs)" -Verbose
+        # Array of DPs fails if Package already removed
+        ForEach ($DP in $allDPs) {
 
-        Remove-CMContentDistribution -ApplicationId $Package.CI_ID -DistributionPointName $allDPs -Force
+            Write-Verbose "Remove - Application : $($id) : $($Package.LocalizedDisplayName) from $($DP)" -Verbose
 
-        Write-Verbose "Remove - Application : $($id) : $($Package.LocalizedDisplayName) from $($allDPGroups)" -Verbose
+            Remove-CMContentDistribution -ApplicationId $Package.CI_ID -DistributionPointName $DP -Force
 
-        Remove-CMContentDistribution -ApplicationId $Package.CI_ID -DistributionPointGroupName $allDPGroups -Force
+        }
+
+        # Array of DPs fails if Package already removed
+        ForEach ($DPGroup in $allDPGroups){
+
+            Write-Verbose "Remove - Application : $($id) : $($Package.LocalizedDisplayName) from $($DPGroup)" -Verbose
+
+            Remove-CMContentDistribution -ApplicationId $Package.CI_ID -DistributionPointGroupName $DPGroup -Force
+
+        }
 
         # Move Package to actioned folder
         $MoveTo = "$($SiteCode):\Application\To Be Deleted"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         $MoveTo = "$($MoveTo)\$($Date)"
 
-        New-Item -Path $MoveTo
+        if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
         if ($package.ObjectPath -notlike "*To Be Deleted*" ) {
 
