@@ -128,7 +128,7 @@ Write-Verbose "Export - applications and packages that are not active" -Verbose
 $FinalApplications `
     | Select-Object -Property LocalizedDisplayName, PackageID, DateCreated, DateLastModified, IsDeployable, IsEnabled, IsExpired, IsHidden, IsSuperseded, DPCount  `
     | Sort-Object -Property LocalizedDisplayName `
-    | Export-Csv -Path "$ReportFolder\CM_Apps.csv" -NoTypeInformation
+    | Export-Csv -Path "$ReportFolder\CM_Applications.csv" -NoTypeInformation
 
 # Export package list to .csv
 $FinalPackages `
