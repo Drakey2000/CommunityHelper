@@ -52,7 +52,7 @@ Write-Verbose "Get - packages" -Verbose
 If ((Get-Module -Name ConfigurationManager).Version.Major -ge 5 -and (Get-Module -Name ConfigurationManager).Version.Minor -ge 2010){
 
     # Get all Regular Packages that are not predefined packages and package name not 'Configuration Manager Client Piloting Package'
-    $RegularPackage = Get-CMPackage -Fast -PackageType RegularPackage | Where-Object {($_.IsPredefinedPackage -eq $false) -or ($_.Name -ne 'Configuration Manager Client Piloting Package')}
+    $RegularPackage = Get-CMPackage -Fast -PackageType RegularPackage | Where-Object {$_.IsPredefinedPackage -eq $false -and $_.Name -ne 'Configuration Manager Client Piloting Package'}
 
     # Get all Driver Packages
     $DriverPackage = Get-CMPackage -Fast -PackageType Driver
