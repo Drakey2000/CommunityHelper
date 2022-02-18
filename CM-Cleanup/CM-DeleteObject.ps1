@@ -15,13 +15,13 @@
     Author:  Steven Drake
     Website: https://ourcommunityhelper.com
     Version:
+        1.1: Added Package Filter and removed $ErrorActionPreference = 'Inquire'
         1.0: Initial release
 
 #>
 
 # Set ErrorAction Variable
 $ErrorActionPreference = 'SilentlyContinue'
-$ErrorActionPreference = 'Inquire'
 
 # Browse Directory Import CSV Function
 Function Get-FileName ($initialDirectory,$Title){
@@ -53,6 +53,8 @@ Function Get-Confirmation ($Title,$Message){
 # Set Suppress Confirmaton Prompt
 [Bool]$SkipConfirmationPrompt = $false
 
+# Set PackageType Filter
+$PackageTypeFilter = "RegularPackage|Driver|ImageDeployment|BootImage|OSInstallPackage"
 
 # Read Application CSV
 $ImportedApplictaionList = import-csv -Path (Get-FileName -initialDirectory “C:\Windows\Temp” -Title "Select Appplication .CSV") -Delimiter ','
@@ -76,10 +78,13 @@ Get-Confirmation -Title "Auto-Approval Confirmation" -Message "Do you wish to wi
 # Remove $ApplicationPackages
 ForEach ($item in $ImportedApplictaionList) {
 
-    # Percentage Caculator
-    $Pecentage = [int][Math]::Round(($($i)/$($ImportedApplictaionList.Count))*100)
+    If($i -ne 0){
 
-    Write-Progress -Activity "Application Delete Progress" -Status "$($Pecentage)% Complete:" -PercentComplete $Pecentage
+        # Percentage Caculator
+        $Pecentage = [int][Math]::Round(($($i)/$($ImportedApplictaionList.Count))*100)
+
+        Write-Progress -Activity "Application Delete Progress" -Status "$($Pecentage)% Complete:" -PercentComplete $Pecentage
+    }
 
     # Get ApplicationPackages List
     $Package = Get-CMApplication | Where-Object {$_.PackageID -eq $item.PackageID}
