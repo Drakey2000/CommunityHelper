@@ -108,7 +108,7 @@ ForEach ($item in $ImportedApplictaionList) {
 
             }
 
-      }else{Write-Verbose "Application found to be superseded! $($item.PackageID) : $($item.LocalizedDisplayName) - skipping deletion" -Verbose}
+        }else{Write-Verbose "Application found to be superseded! $($item.PackageID) : $($item.LocalizedDisplayName) - skipping deletion" -Verbose}
 
     }else{Write-Verbose "Application not found! $($item.PackageID) : $($item.LocalizedDisplayName)" -Verbose}
 

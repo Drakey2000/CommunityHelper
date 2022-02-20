@@ -105,7 +105,7 @@ ForEach ($item in $ImportedApplictaionList) {
     if ($null -ne $Package){
         
         # Check if Applictaion is Superseded
-        If ($Package.IsSuperseded -eq $true){Write-Verbose "$($Package.LocalizedDisplayName) - is a superseded Application and may still be required" -Verbose}
+        If ($Package.IsSuperseded -eq $true){Write-Verbose "$($Package.LocalizedDisplayName) - is a superseded application and its content may still be required" -Verbose}
 
         # Confirm Content Removal
         if ($SkipConfirmationPrompt-eq $false){Get-Confirmation -Title "Confirm Content Removal" -Message "Remove - Application`r`n`r`n$($Package.PackageID) : $($Package.LocalizedDisplayName)`r`n`r`nFrom all Distribution Points?"}
@@ -275,9 +275,6 @@ ForEach ($item in $ImportedPackageList) {
                 # Move Package to Actioned Date Folder
                 $Package | Move-CMObject -FolderPath $MoveTo
 
-            }else{
-
-                Write-Verbose "Leave - $($FriendlyPackageType) : $($Package.PackageID) : $($Package.Name) in $($PackageObjectPath)" -Verbose
             }
 
         }
