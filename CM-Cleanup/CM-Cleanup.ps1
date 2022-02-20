@@ -14,7 +14,6 @@
 
     File Name      : CM - Cleanup.ps1
     Author         : S.P.Drake
-    Version        : 1.2  : Added superseded -eq False to applictaion filter (as if used in a task sequence, all superseded content need to be avaliable on DPs) 
     Version        : 1.1  : Added content distribution count, package type translation and ConfigurationManager compatibility
     Version        : 1.0  : Enhanced package filter, exclude predefined packages, Configuration Manager Client Piloting Package and DefaultImages and dependant programs
 
@@ -45,7 +44,7 @@ $groupedPackageContentCount  = $packageContentCount | Sort-Object $_.Name | Grou
 Write-Verbose "Get - applications" -Verbose
 
 # Get all Applications that are not deployed, have no dependant task sequences, no deployment types that depend on this application and not superseded - (can't filter packages like applications)
-$AllApplications = Get-CMApplication | Where-Object {($_.IsDeployed -eq $False) -and ($_.NumberofDependentTS -eq 0) -and ($_.NumberofDependentDTs -eq 0) -and ($_.IsSuperseded -eq $False)}
+$AllApplications = Get-CMApplication | Where-Object {($_.IsDeployed -eq $False) -and ($_.NumberofDependentTS -eq 0) -and ($_.NumberofDependentDTs -eq 0)}
 
 Write-Verbose "Get - packages" -Verbose
 
