@@ -15,6 +15,7 @@
     Author:  Steven Drake
     Website: https://ourcommunityhelper.com
     Version:
+        1.2: Handling of superseded applications, skip deletion.
         1.1: Added Package Filter and removed $ErrorActionPreference = 'Inquire'
         1.0: Initial release
 
@@ -92,17 +93,22 @@ ForEach ($item in $ImportedApplictaionList) {
     # If Packages Found
     if ($null -ne $Package){
 
-        # Confirm Content Removal
-        if ($SkipConfirmationPrompt-eq $false){Get-Confirmation -Title "Confirm Permanently Delete" -Message "Permanently Delete - Application`r`n`r`n$($Package.PackageID) : $($Package.LocalizedDisplayName)`r`n`r`nFrom Configuration Manager?"}
+       # Only delete non superseded applications
+       If ($Package.IsSuperseded -eq $false){
 
-        # Remove Package From All DPs
-        if($MessageResult -eq 'Yes' -or $SkipConfirmationPrompt -eq $true){
+            # Confirm Content Removal
+            if ($SkipConfirmationPrompt-eq $false){Get-Confirmation -Title "Confirm Permanently Delete" -Message "Permanently Delete - Application`r`n`r`n$($Package.PackageID) : $($Package.LocalizedDisplayName)`r`n`r`nFrom Configuration Manager?"}
 
-            Write-Verbose "Deleted - Application : $($Package.PackageID) : $($Package.LocalizedDisplayName)" -Verbose
+            # Remove Package From All DPs
+            if($MessageResult -eq 'Yes' -or $SkipConfirmationPrompt -eq $true){
 
-            Remove-CMApplication -ModelName $Package.ModelName -Force
+                Write-Verbose "Deleted - Application : $($Package.PackageID) : $($Package.LocalizedDisplayName)" -Verbose
 
-        }
+                Remove-CMApplication -ModelName $Package.ModelName -Force
+
+            }
+
+      }else{Write-Verbose "Application found to be superseded! $($item.PackageID) : $($item.LocalizedDisplayName) - skipping deletion" -Verbose}
 
     }else{Write-Verbose "Application not found! $($item.PackageID) : $($item.LocalizedDisplayName)" -Verbose}
 

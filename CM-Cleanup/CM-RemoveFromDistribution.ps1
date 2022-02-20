@@ -16,6 +16,7 @@
     Author  :  Steven Drake
     Website : https://ourcommunityhelper.com
     Version :
+       1.1  : Handling of superseded applications, remove content from DPs, but leave application in the existing folder and do not move to actioned folder 
        1.0  : Initial release
 
 #>
@@ -102,6 +103,9 @@ ForEach ($item in $ImportedApplictaionList) {
 
     # If Packages Found
     if ($null -ne $Package){
+        
+        # Check if Applictaion is Superseded
+        If ($Package.IsSuperseded -eq $true){Write-Verbose "$($Package.LocalizedDisplayName) - is a superseded Application and may still be required" -Verbose}
 
         # Confirm Content Removal
         if ($SkipConfirmationPrompt-eq $false){Get-Confirmation -Title "Confirm Content Removal" -Message "Remove - Application`r`n`r`n$($Package.PackageID) : $($Package.LocalizedDisplayName)`r`n`r`nFrom all Distribution Points?"}
@@ -133,29 +137,33 @@ ForEach ($item in $ImportedApplictaionList) {
             # Get Parent Folder
             $ParentFolder = $PackageObjectPath.Split('/')[1]
 
-            # Is Object Is Outside Of Actioned Folder
-            If($ParentFolder -ne $ActionedFolder){
+            # Move none superseded Applictaions only
+            If ($Package.IsSuperseded -eq $false){
 
-                # Build Package Folder Root Path
-                $MoveTo = "$($SiteCode):\Application\$($ActionedFolder)"
+                # Is Object Is Outside Of Actioned Folder
+                If($ParentFolder -ne $ActionedFolder){
 
-                # Create Package Root Folder
-                if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
+                    # Build Package Folder Root Path
+                    $MoveTo = "$($SiteCode):\Application\$($ActionedFolder)"
 
-                # Assign Date Sub Folder
-                $MoveTo = "$($MoveTo)\$($Date)"
+                    # Create Package Root Folder
+                    if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
-                # If SubFolder Does Not Exist - Create Sub Folder
-                if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
+                    # Assign Date Sub Folder
+                    $MoveTo = "$($MoveTo)\$($Date)"
 
-                Write-Verbose "Move - Application : $($Package.PackageID) : $($Package.LocalizedDisplayName) to $($MoveTo)" -Verbose
+                    # If SubFolder Does Not Exist - Create Sub Folder
+                    if (!(Test-Path -Path $MoveTo)){New-Item -Path $MoveTo}
 
-                # Move Package to Actioned Date Folder
-                $Package | Move-CMObject -FolderPath $MoveTo
+                    Write-Verbose "Move - Application : $($Package.PackageID) : $($Package.LocalizedDisplayName) to $($MoveTo)" -Verbose
 
-            }else{
+                    # Move Package to Actioned Date Folder
+                    $Package | Move-CMObject -FolderPath $MoveTo
 
-                Write-Verbose "Leave - Application : $($Package.PackageID) : $($Package.LocalizedDisplayName) in $($PackageObjectPath)" -Verbose
+                }else{
+
+                    Write-Verbose "Move - Application : $($Package.PackageID) : $($Package.LocalizedDisplayName) in $($PackageObjectPath)" -Verbose
+                }
             }
         }
 
