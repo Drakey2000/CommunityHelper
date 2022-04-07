@@ -15,6 +15,7 @@
     Author         : S.P.Drake
 
     Version
+         1.2       : Exclude Intel Optane Memory from valid System Disk - https://support.hp.com/gb-en/document/c06692694
          1.1       : Added 'No physical disks have been detected' Error Code
          1.0       : Initial version
 
@@ -71,8 +72,8 @@ if ($TSEnv.Value('_SMSTSBootUEFI') -eq $True){$Style = 'GPT'} else {$Style = 'MB
 Write-Log -Message  "All BusTypes excluding USB are searched"
 Write-Log
 
-# Get only physical disks that are not BusType USB and order by size (smallest to largest)
-$physicalDisks = Get-PhysicalDisk | Where-Object {$_.Bustype -ne 'USB'} | Sort-Object -Property @{Expression = "Size"; Descending = $False}
+# Get only physical disks that are not BusType USB or Intel Optane Memory and order by size (smallest to largest)
+$physicalDisks = Get-PhysicalDisk | Where-Object {($_.Bustype -ne 'USB') -and -not($_.Size -lt 34359738368 -and $_.Model -match 'Intel')} | Sort-Object -Property @{Expression = "Size"; Descending = $False}
 
     # Did we find any matching physical disks ?
     if ($physicalDisks.count -eq 0) {
