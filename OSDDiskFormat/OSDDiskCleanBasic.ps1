@@ -3,11 +3,13 @@
     This script is destructive as it contains Clear-Disk
 
 .SYNOPSIS
-    Warning Destructive - Created to run in WinPE OSD to Clear-Disk and assign OSDDiskIndex to task sequence Disk Advanced Option Partition Variable
+    Warning Destructive - Created to run in WinPE OSD to Clear-Disk and assign OSDDiskIndex, which is then used to specifiy the physical disk number to be partitioned
+    and used for Operating System installation
+    
 
 .DESCRIPTION
-    Runs in WinPE OSD to find all non USB Bus Types, format disk drive(s) and assign smallest disk as OSDDiskIndex variable to be used in the
-    task sequence
+    Runs in WinPE OSD to find all non USB Bus Types and Intel Optane Memory, format disk drive(s) and assign smallest disk as OSDDiskIndex variable to be used in the
+    Task Sequence https://docs.microsoft.com/en-us/mem/configmgr/osd/understand/task-sequence-variables
 
 .NOTES
     File Name      : osddiskcleanbasic.ps1
@@ -15,7 +17,7 @@
     Author         : S.P.Drake
 
     Version
-         1.2       : Exclude unconfigured Intel Optane Memory as valid system disk - https://support.hp.com/gb-en/document/c06692694
+         1.2       : Exclude Intel Optane Memory as valid system disk - https://support.hp.com/gb-en/document/c06692694
          1.1       : Added 'No physical disks have been detected' Error Code
          1.0       : Initial version
 
@@ -42,7 +44,7 @@ Function Write-Log {
 
     [Parameter(Mandatory=$False)]
     [string]
-    $logfile = "$($TSEnv.value('_SMSTSLogPath'))\OSD_DiskSearchandClean.log"
+    $logfile = "$($TSEnv.value('_SMSTSLogPath'))\OSD_DiskPartition.log"
     )
 
     $Stamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
@@ -69,10 +71,10 @@ $TSEnv = New-Object -COMObject Microsoft.SMS.TSEnvironment
 # Read Task Sequnce Variable _SMSTSBootUEFI and set Partition Style
 if ($TSEnv.Value('_SMSTSBootUEFI') -eq $True){$Style = 'GPT'} else {$Style = 'MBR'}
 
-Write-Log -Message  "All BusTypes excluding USB are searched"
+Write-Log -Message  "All BusTypes excluding USB and Intel Optane Memory are searched"
 Write-Log
 
-# Get all physical disks that are not BusType USB or unconfigured Intel Optane Memory and order by size (smallest to largest)
+# Get all physical disks that are not BusType USB or Intel Optane Memory and order by size (smallest to largest)
 $physicalDisks = Get-PhysicalDisk | Where-Object {($_.Bustype -ne 'USB') -and -not($_.Size -lt 34359738368 -and $_.Model -match 'Intel')} | Sort-Object -Property @{Expression = "Size"; Descending = $False}
 
     # Did we find any matching physical disks ?
