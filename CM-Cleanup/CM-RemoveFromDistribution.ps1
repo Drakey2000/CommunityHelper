@@ -16,7 +16,7 @@
     Author  :  Steven Drake
     Website : https://ourcommunityhelper.com
     Version :
-       1.2  : Reinstated remove content package type parameters, overzealous on last tidy-up !  
+       1.3  : Reinstated remove content package type parameters, overzealous on last tidy-up !  
        1.1  : Handling of superseded applications, remove content from DPs, but leave application in the existing folder and do not move to actioned folder
        1.0  : Initial release
 
