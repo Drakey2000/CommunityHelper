@@ -15,7 +15,7 @@
 .NOTES
     Author  :  Steven Drake
     Website : https://ourcommunityhelper.com
-    Version : 
+    Version :
        1.2  : Reinstated remove content package type parameters, overzealous on last tidy-up !  
        1.1  : Handling of superseded applications, remove content from DPs, but leave application in the existing folder and do not move to actioned folder
        1.0  : Initial release
@@ -218,7 +218,7 @@ ForEach ($item in $ImportedPackageList) {
             }
             # OSInstallPackage
             259 {
-                $PackageTypeSearch = "select * from SMS_OSInstallPackage WHERE PackageID = '$($Package.PackageID)'"
+                $PackageTypeSearch = "select * from SMS_OperatingSystemInstallPackage WHERE PackageID = '$($Package.PackageID)'"
                 $FriendlyPackageType = "OperatingSystemInstaller"
             }
             default{$FriendlyPackageType = "Unknown Package Type"}
@@ -252,7 +252,7 @@ ForEach ($item in $ImportedPackageList) {
                     258 {Remove-CMContentDistribution -BootImageId $Package.PackageID -DistributionPointName $DP -Force}
 
                     # OSInstallPackage
-                    259 {Remove-CMContentDistribution -DeploymentPackageId $Package.PackageID -DistributionPointName $DP -Force}
+                    259 {Remove-CMContentDistribution -OperatingSystemInstallerId $Package.PackageID -DistributionPointName $DP -Force}
 
                     default{Write-Verbose "Unknown Package Type"}
 
@@ -280,7 +280,7 @@ ForEach ($item in $ImportedPackageList) {
                     258 {Remove-CMContentDistribution -BootImageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
 
                     # OSInstallPackage
-                    259 {Remove-CMContentDistribution -DeploymentPackageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
+                    259 {Remove-CMContentDistribution -OperatingSystemInstallerId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
 
                     default{Write-Verbose "Unknown Package Type"}
 
