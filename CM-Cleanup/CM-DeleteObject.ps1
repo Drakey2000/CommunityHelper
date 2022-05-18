@@ -15,6 +15,7 @@
     Author:  Steven Drake
     Website: https://ourcommunityhelper.com
     Version:
+        1.3: Corrected typo Remove-CMOperatingSystemInstalle to Remove-CMOperatingSystemInstaller
         1.2: Handling of superseded applications, skip deletion.
         1.1: Added Package Filter and removed $ErrorActionPreference = 'Inquire'
         1.0: Initial release
@@ -158,7 +159,7 @@ ForEach ($item in $ImportedPackageList) {
             258 {Remove-CMBootImage -Id $Package.PackageID -Force}
 
             # OSInstallPackage
-            259 {Remove-CMOperatingSystemInstalle -Id $Package.PackageID -Force}
+            259 {Remove-CMOperatingSystemInstaller -Id $Package.PackageID -Force}
 
             default{Write-Verbose "Unknown Package Type" -Verbose}
 
