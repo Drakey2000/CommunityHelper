@@ -15,8 +15,9 @@
 .NOTES
     Author  :  Steven Drake
     Website : https://ourcommunityhelper.com
-    Version :
-       1.1  : Handling of superseded applications, remove content from DPs, but leave application in the existing folder and do not move to actioned folder 
+    Version : 
+       1.2  : Reinstated remove content package type parameters, overzealous on last tidy-up !  
+       1.1  : Handling of superseded applications, remove content from DPs, but leave application in the existing folder and do not move to actioned folder
        1.0  : Initial release
 
 #>
@@ -103,7 +104,7 @@ ForEach ($item in $ImportedApplictaionList) {
 
     # If Packages Found
     if ($null -ne $Package){
-        
+
         # Check if Applictaion is Superseded
         If ($Package.IsSuperseded -eq $true){Write-Verbose "$($Package.LocalizedDisplayName) - is a superseded application and its content may still be required" -Verbose}
 
@@ -236,7 +237,26 @@ ForEach ($item in $ImportedPackageList) {
 
                 Write-Verbose "Remove - $($FriendlyPackageType): $($Package.PackageID) : $($Package.Name) from DP : $($DP)" -Verbose
 
-                Remove-CMContentDistribution -PackageId $Package.PackageID -DistributionPointName $DP -Force
+                    Switch($Package.PackageType){
+
+                    # RegularPackage
+                    0 {Remove-CMContentDistribution -PackageId $Package.PackageID -DistributionPointName $DP -Force}
+
+                    # DriverPackage
+                    3 {Remove-CMContentDistribution -DriverPackageId $Package.PackageID -DistributionPointName $DP -Force}
+
+                    # ImageDeployment
+                    257 {Remove-CMContentDistribution -OperatingSystemImageId $Package.PackageID -DistributionPointName $DP -Force}
+
+                    # BootImage
+                    258 {Remove-CMContentDistribution -BootImageId $Package.PackageID -DistributionPointName $DP -Force}
+
+                    # OSInstallPackage
+                    259 {Remove-CMContentDistribution -DeploymentPackageId $Package.PackageID -DistributionPointName $DP -Force}
+
+                    default{Write-Verbose "Unknown Package Type"}
+
+                    }
 
             }
 
@@ -245,7 +265,26 @@ ForEach ($item in $ImportedPackageList) {
 
                 Write-Verbose "Remove - $($FriendlyPackageType) : $($Package.PackageID) : $($Package.Name) from DP Group : $($DPGroup)" -Verbose
 
-                Remove-CMContentDistribution -PackageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force
+                    Switch($Package.PackageType){
+
+                    # RegularPackage
+                    0 {Remove-CMContentDistribution -PackageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
+
+                    # DriverPackage
+                    3 {Remove-CMContentDistribution -DriverPackageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
+
+                    # ImageDeployment
+                    257 {Remove-CMContentDistribution -OperatingSystemImageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
+
+                    # BootImage
+                    258 {Remove-CMContentDistribution -BootImageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
+
+                    # OSInstallPackage
+                    259 {Remove-CMContentDistribution -DeploymentPackageId $Package.PackageID -DistributionPointGroupName $DPGroup -Force}
+
+                    default{Write-Verbose "Unknown Package Type"}
+
+                    }
 
             }
 
