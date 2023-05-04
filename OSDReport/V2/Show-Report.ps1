@@ -12,6 +12,7 @@
 .NOTES
     Author     : STEVEN DRAKE - https://ourcommunityhelper.com/2020/11/27/operating-system-deployment-summary-screen/
     Version    : 12 Feb  2021 - Updated Try Catch BitLocker Get-BitLockerVolume
+    Version    : 04 May  2023 - Updated Computer Info to work for Windows 10 and Windows 11
 #>
 ##################################################################  Set Startup Parameters  ##################################################################
 
@@ -63,12 +64,16 @@
     # Get Computer Information
     $ComputerInfo = Get-ComputerInfo
 
-    # Get System Info
-    $SystemInfo = $ComputerInfo | Select-Object `
-        @{Name = "Product"; Expression = {$_.OsName}},
-        @{Name = "Version"; Expression = {$_.WindowsVersion}},
-        @{Name = "Architecture"; Expression = {$_.OsArchitecture}},
-        @{Name = "Memory GB"; Expression = {$_.CsPhyicallyInstalledMemory /1024 /1024}}
+    # Get Current Version Information
+    $CurrentVersionInfo = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+
+    # Create System Info
+    $SystemInfo = [PSCustomObject]@{
+        'Product'       = $ComputerInfo.OsName
+        'Version'       = $CurrentVersionInfo.DisplayVersion
+        'Architecture'  = $ComputerInfo.OsArchitecture
+        'MemoryGB'      = $ComputerInfo.CsPhyicallyInstalledMemory /1024 /1024
+    }
 
     # Get Fixed Disk Volumes
     $SystemVolumes = Get-Volume | Select-Object DriveLetter,FileSystemLabel,FileSystemType,DriveType,HealthStatus,OperationalStatus,@{Name = "SizeGB"; Expression = {[math]::round($_.size/1GB, 1)}} |  Where-Object {($_.DriveType -eq 'Fixed') -and ($_.DriveLetter -ne $Null)} | Sort-Object DriveLetter
