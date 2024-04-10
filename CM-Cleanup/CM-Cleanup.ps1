@@ -14,6 +14,7 @@
 
     File Name      : CM - Cleanup.ps1
     Author         : S.P.Drake
+    Version        : 1.2  : Changed Get-CMPackage expression from OR to AND 
     Version        : 1.1  : Added content distribution count, package type translation and ConfigurationManager compatibility
     Version        : 1.0  : Enhanced package filter, exclude predefined packages, Configuration Manager Client Piloting Package and DefaultImages and dependant programs
 
@@ -72,7 +73,7 @@ If ((Get-Module -Name ConfigurationManager).Version.Major -ge 5 -and (Get-Module
     else{
 
     # Get all Regular Packages that are not predefined packages and package name not 'Configuration Manager Client Piloting Package'
-    $AllPackages = Get-CMPackage -Fast | Where-Object {($_.IsPredefinedPackage -eq $false) -or ($_.Name -ne 'Configuration Manager Client Piloting Package')}
+    $AllPackages = Get-CMPackage -Fast | Where-Object {($_.IsPredefinedPackage -eq $false) -and ($_.Name -ne 'Configuration Manager Client Piloting Package')}
 
     }
 
